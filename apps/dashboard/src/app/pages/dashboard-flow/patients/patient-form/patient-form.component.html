@@ -1,0 +1,987 @@
+<!-- Header -->
+<div class="mb-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        {{
+          isEditMode()
+            ? ('patients.form.editTitle' | transloco)
+            : ('patients.form.addTitle' | transloco)
+        }}
+      </h1>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+        {{ 'patients.form.title' | transloco }}
+      </p>
+    </div>
+    <button
+      type="button"
+      (click)="cancel()"
+      class="text-gray-400 hover:text-gray-500 dark:text-gray-500 dark:hover:text-gray-400 transition-colors duration-200">
+      <svg
+        class="w-6 h-6"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+<!-- Loading State -->
+@if (loading()) {
+<div class="bg-white dark:bg-dark-800 shadow rounded-lg p-6">
+  <div class="flex items-center justify-center h-32">
+    <div
+      class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 dark:border-primary-400"></div>
+    <span class="ms-3 text-gray-600 dark:text-gray-400">{{
+      'patients.loading' | transloco
+    }}</span>
+  </div>
+</div>
+}
+
+<!-- Error State -->
+@if (error()) {
+<div
+  class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+  <div class="flex">
+    <svg
+      class="h-5 w-5 text-red-400 dark:text-red-400 mt-0.5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <div class="ms-3">
+      <h3 class="text-sm font-medium text-red-800 dark:text-red-400">
+        {{ 'patients.error' | transloco }}
+      </h3>
+      <p class="text-sm text-red-700 dark:text-red-400 mt-1">{{ error() }}</p>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Form Container -->
+@if (!loading()) {
+<form [formGroup]="patientForm" (ngSubmit)="onSubmit()" class="space-y-6">
+  <!-- Progress Steps -->
+  <div class="bg-white dark:bg-dark-800 shadow rounded-lg p-6">
+    <nav class="flex items-center justify-center">
+      <ol class="flex items-center gap-4 md:gap-8">
+        @for (step of [1, 2, 3, 4]; track step) {
+        <li class="flex items-center">
+          <button
+            type="button"
+            (click)="goToStep(step)"
+            [class]="
+              'flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium transition-colors duration-200 ' +
+              (step === currentStep()
+                ? 'bg-primary-600 text-white dark:bg-primary-500'
+                : step < currentStep()
+                ? 'bg-green-600 text-white dark:bg-green-500'
+                : 'bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400')
+            ">
+            @if (step < currentStep()) {
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 13l4 4L19 7" />
+            </svg>
+            } @else {
+            {{ step }}
+            }
+          </button>
+          <span
+            class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-100 hidden md:block">
+            @switch (step) { @case (1) {
+            {{ 'patients.form.step1' | transloco }}
+            } @case (2) {
+            {{ 'patients.form.step2' | transloco }}
+            } @case (3) {
+            {{ 'patients.form.step3' | transloco }}
+            } @case (4) {
+            {{ 'patients.form.step4' | transloco }}
+            } }
+          </span>
+          @if (step < 4) {
+          <svg
+            class="w-5 h-5 ms-2 text-gray-300 dark:text-gray-600"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7" />
+          </svg>
+          }
+        </li>
+        }
+      </ol>
+    </nav>
+  </div>
+
+  <!-- Step 1: Personal Information -->
+  @if (currentStep() === 1) {
+  <div class="bg-white dark:bg-dark-800 shadow rounded-lg p-6 animate-fade-in">
+    <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-6">
+      {{ 'patients.form.step1' | transloco }}
+    </h2>
+
+    <div
+      formGroupName="personalInfo"
+      class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- First Name -->
+      <div>
+        <label
+          for="firstName"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {{ 'patients.form.firstName' | transloco }}
+          <span class="text-red-500 dark:text-red-400">*</span>
+        </label>
+        <input
+          type="text"
+          id="firstName"
+          formControlName="firstName"
+          [placeholder]="'patients.form.placeholder.firstName' | transloco"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ' +
+            (isFieldInvalid(personalInfoForm, 'firstName')
+              ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
+              : 'border-gray-300 dark:border-gray-600')
+          " />
+        @if (isFieldInvalid(personalInfoForm, 'firstName')) {
+        <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError(personalInfoForm, 'firstName') }}
+        </p>
+        }
+      </div>
+
+      <!-- Last Name -->
+      <div>
+        <label
+          for="lastName"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {{ 'patients.form.lastName' | transloco }}
+          <span class="text-red-500 dark:text-red-400">*</span>
+        </label>
+        <input
+          type="text"
+          id="lastName"
+          formControlName="lastName"
+          [placeholder]="'patients.form.placeholder.lastName' | transloco"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 ' +
+            (isFieldInvalid(personalInfoForm, 'lastName')
+              ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20'
+              : 'border-gray-300 dark:border-gray-600')
+          " />
+        @if (isFieldInvalid(personalInfoForm, 'lastName')) {
+        <p class="mt-1 text-sm text-red-600 dark:text-red-400">
+          {{ getFieldError(personalInfoForm, 'lastName') }}
+        </p>
+        }
+      </div>
+
+      <!-- Date of Birth -->
+      <div>
+        <label
+          for="dateOfBirth"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.dateOfBirth' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="date"
+          id="dateOfBirth"
+          formControlName="dateOfBirth"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+            (isFieldInvalid(personalInfoForm, 'dateOfBirth')
+              ? 'border-red-300 bg-red-50'
+              : 'border-gray-300')
+          " />
+        @if (isFieldInvalid(personalInfoForm, 'dateOfBirth')) {
+        <p class="mt-1 text-sm text-red-600">
+          {{ getFieldError(personalInfoForm, 'dateOfBirth') }}
+        </p>
+        }
+      </div>
+
+      <!-- Gender -->
+      <div>
+        <label
+          for="gender"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.gender' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <select
+          id="gender"
+          formControlName="gender"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+            (isFieldInvalid(personalInfoForm, 'gender')
+              ? 'border-red-300 bg-red-50'
+              : 'border-gray-300')
+          ">
+          <option value="">{{ 'patients.allGenders' | transloco }}</option>
+          <option [value]="Gender.Male">
+            {{ 'patients.male' | transloco }}
+          </option>
+          <option [value]="Gender.Female">
+            {{ 'patients.female' | transloco }}
+          </option>
+          <option [value]="Gender.Other">
+            {{ 'patients.other' | transloco }}
+          </option>
+        </select>
+        @if (isFieldInvalid(personalInfoForm, 'gender')) {
+        <p class="mt-1 text-sm text-red-600">
+          {{ getFieldError(personalInfoForm, 'gender') }}
+        </p>
+        }
+      </div>
+
+      <!-- National ID -->
+      <div>
+        <label
+          for="nationalId"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.nationalId' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="nationalId"
+          formControlName="nationalId"
+          [placeholder]="'patients.form.placeholder.nationalId' | transloco"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+            (isFieldInvalid(personalInfoForm, 'nationalId')
+              ? 'border-red-300 bg-red-50'
+              : 'border-gray-300')
+          " />
+        @if (isFieldInvalid(personalInfoForm, 'nationalId')) {
+        <p class="mt-1 text-sm text-red-600">
+          {{ getFieldError(personalInfoForm, 'nationalId') }}
+        </p>
+        }
+      </div>
+
+      <!-- Marital Status -->
+      <div>
+        <label
+          for="maritalStatus"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.maritalStatus' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <select
+          id="maritalStatus"
+          formControlName="maritalStatus"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+            (isFieldInvalid(personalInfoForm, 'maritalStatus')
+              ? 'border-red-300 bg-red-50'
+              : 'border-gray-300')
+          ">
+          <option value="">Select marital status</option>
+          <option [value]="MaritalStatus.Single">
+            {{ 'patients.form.single' | transloco }}
+          </option>
+          <option [value]="MaritalStatus.Married">
+            {{ 'patients.form.married' | transloco }}
+          </option>
+          <option [value]="MaritalStatus.Divorced">
+            {{ 'patients.form.divorced' | transloco }}
+          </option>
+          <option [value]="MaritalStatus.Widowed">
+            {{ 'patients.form.widowed' | transloco }}
+          </option>
+        </select>
+        @if (isFieldInvalid(personalInfoForm, 'maritalStatus')) {
+        <p class="mt-1 text-sm text-red-600">
+          {{ getFieldError(personalInfoForm, 'maritalStatus') }}
+        </p>
+        }
+      </div>
+
+      <!-- Occupation -->
+      <div>
+        <label
+          for="occupation"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.occupation' | transloco }}
+          <span class="text-gray-500 text-xs"
+            >({{ 'patients.form.optional' | transloco }})</span
+          >
+        </label>
+        <input
+          type="text"
+          id="occupation"
+          formControlName="occupation"
+          [placeholder]="'patients.form.placeholder.occupation' | transloco"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+      </div>
+
+      <!-- Nationality -->
+      <div>
+        <label
+          for="nationality"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.nationality' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <select
+          id="nationality"
+          formControlName="nationality"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+            (isFieldInvalid(personalInfoForm, 'nationality')
+              ? 'border-red-300 bg-red-50'
+              : 'border-gray-300')
+          ">
+          <option value="">Select nationality</option>
+          @for (country of countries; track country) {
+          <option [value]="country">{{ country }}</option>
+          }
+        </select>
+        @if (isFieldInvalid(personalInfoForm, 'nationality')) {
+        <p class="mt-1 text-sm text-red-600">
+          {{ getFieldError(personalInfoForm, 'nationality') }}
+        </p>
+        }
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Step 2: Contact Information -->
+  @if (currentStep() === 2) {
+  <div class="bg-white shadow rounded-lg p-6 animate-fade-in">
+    <h2 class="text-lg font-medium text-gray-900 mb-6">
+      {{ 'patients.form.step2' | transloco }}
+    </h2>
+
+    <div formGroupName="contactInfo" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Email -->
+        <div>
+          <label
+            for="email"
+            class="block text-sm font-medium text-gray-700 mb-2">
+            {{ 'patients.form.email' | transloco }}
+            <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            [placeholder]="'patients.form.placeholder.email' | transloco"
+            [class]="
+              'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+              (isFieldInvalid(contactInfoForm, 'email')
+                ? 'border-red-300 bg-red-50'
+                : 'border-gray-300')
+            " />
+          @if (isFieldInvalid(contactInfoForm, 'email')) {
+          <p class="mt-1 text-sm text-red-600">
+            {{ getFieldError(contactInfoForm, 'email') }}
+          </p>
+          }
+        </div>
+
+        <!-- Phone -->
+        <div>
+          <label
+            for="phone"
+            class="block text-sm font-medium text-gray-700 mb-2">
+            {{ 'patients.form.phone' | transloco }}
+            <span class="text-red-500">*</span>
+          </label>
+          <input
+            type="tel"
+            id="phone"
+            formControlName="phone"
+            [placeholder]="'patients.form.placeholder.phone' | transloco"
+            [class]="
+              'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+              (isFieldInvalid(contactInfoForm, 'phone')
+                ? 'border-red-300 bg-red-50'
+                : 'border-gray-300')
+            " />
+          @if (isFieldInvalid(contactInfoForm, 'phone')) {
+          <p class="mt-1 text-sm text-red-600">
+            {{ getFieldError(contactInfoForm, 'phone') }}
+          </p>
+          }
+        </div>
+
+        <!-- Alternate Phone -->
+        <div class="md:col-span-2">
+          <label
+            for="alternatePhone"
+            class="block text-sm font-medium text-gray-700 mb-2">
+            {{ 'patients.form.alternatePhone' | transloco }}
+            <span class="text-gray-500 text-xs"
+              >({{ 'patients.form.optional' | transloco }})</span
+            >
+          </label>
+          <input
+            type="tel"
+            id="alternatePhone"
+            formControlName="alternatePhone"
+            [placeholder]="
+              'patients.form.placeholder.alternatePhone' | transloco
+            "
+            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+      </div>
+
+      <!-- Address -->
+      <div formGroupName="address">
+        <h3 class="text-md font-medium text-gray-900 mb-4">
+          {{ 'patients.form.address' | transloco }}
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Street -->
+          <div class="md:col-span-2">
+            <label
+              for="street"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.street' | transloco }}
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="street"
+              formControlName="street"
+              [placeholder]="'patients.form.placeholder.street' | transloco"
+              [class]="
+                'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+                (isFieldInvalid(addressForm, 'street')
+                  ? 'border-red-300 bg-red-50'
+                  : 'border-gray-300')
+              " />
+            @if (isFieldInvalid(addressForm, 'street')) {
+            <p class="mt-1 text-sm text-red-600">
+              {{ getFieldError(addressForm, 'street') }}
+            </p>
+            }
+          </div>
+
+          <!-- City -->
+          <div>
+            <label
+              for="city"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.city' | transloco }}
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="city"
+              formControlName="city"
+              [placeholder]="'patients.form.placeholder.city' | transloco"
+              [class]="
+                'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+                (isFieldInvalid(addressForm, 'city')
+                  ? 'border-red-300 bg-red-50'
+                  : 'border-gray-300')
+              " />
+            @if (isFieldInvalid(addressForm, 'city')) {
+            <p class="mt-1 text-sm text-red-600">
+              {{ getFieldError(addressForm, 'city') }}
+            </p>
+            }
+          </div>
+
+          <!-- State -->
+          <div>
+            <label
+              for="state"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.state' | transloco }}
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="state"
+              formControlName="state"
+              [placeholder]="'patients.form.placeholder.state' | transloco"
+              [class]="
+                'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+                (isFieldInvalid(addressForm, 'state')
+                  ? 'border-red-300 bg-red-50'
+                  : 'border-gray-300')
+              " />
+            @if (isFieldInvalid(addressForm, 'state')) {
+            <p class="mt-1 text-sm text-red-600">
+              {{ getFieldError(addressForm, 'state') }}
+            </p>
+            }
+          </div>
+
+          <!-- ZIP Code -->
+          <div>
+            <label
+              for="zipCode"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.zipCode' | transloco }}
+              <span class="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              id="zipCode"
+              formControlName="zipCode"
+              [placeholder]="'patients.form.placeholder.zipCode' | transloco"
+              [class]="
+                'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+                (isFieldInvalid(addressForm, 'zipCode')
+                  ? 'border-red-300 bg-red-50'
+                  : 'border-gray-300')
+              " />
+            @if (isFieldInvalid(addressForm, 'zipCode')) {
+            <p class="mt-1 text-sm text-red-600">
+              {{ getFieldError(addressForm, 'zipCode') }}
+            </p>
+            }
+          </div>
+
+          <!-- Country -->
+          <div>
+            <label
+              for="country"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.country' | transloco }}
+              <span class="text-red-500">*</span>
+            </label>
+            <select
+              id="country"
+              formControlName="country"
+              [class]="
+                'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+                (isFieldInvalid(addressForm, 'country')
+                  ? 'border-red-300 bg-red-50'
+                  : 'border-gray-300')
+              ">
+              <option value="">Select country</option>
+              @for (country of countries; track country) {
+              <option [value]="country">{{ country }}</option>
+              }
+            </select>
+            @if (isFieldInvalid(addressForm, 'country')) {
+            <p class="mt-1 text-sm text-red-600">
+              {{ getFieldError(addressForm, 'country') }}
+            </p>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Step 3: Medical Information -->
+  @if (currentStep() === 3) {
+  <div class="bg-white shadow rounded-lg p-6 animate-fade-in">
+    <h2 class="text-lg font-medium text-gray-900 mb-6">
+      {{ 'patients.form.step3' | transloco }}
+    </h2>
+
+    <div formGroupName="medicalInfo" class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Blood Type -->
+        <div>
+          <label
+            for="bloodType"
+            class="block text-sm font-medium text-gray-700 mb-2">
+            {{ 'patients.form.bloodType' | transloco }}
+            <span class="text-red-500">*</span>
+          </label>
+          <select
+            id="bloodType"
+            formControlName="bloodType"
+            [class]="
+              'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+              (isFieldInvalid(medicalInfoForm, 'bloodType')
+                ? 'border-red-300 bg-red-50'
+                : 'border-gray-300')
+            ">
+            <option value="">Select blood type</option>
+            <option [value]="BloodType.APositive">A+</option>
+            <option [value]="BloodType.ANegative">A-</option>
+            <option [value]="BloodType.BPositive">B+</option>
+            <option [value]="BloodType.BNegative">B-</option>
+            <option [value]="BloodType.ABPositive">AB+</option>
+            <option [value]="BloodType.ABNegative">AB-</option>
+            <option [value]="BloodType.OPositive">O+</option>
+            <option [value]="BloodType.ONegative">O-</option>
+          </select>
+          @if (isFieldInvalid(medicalInfoForm, 'bloodType')) {
+          <p class="mt-1 text-sm text-red-600">
+            {{ getFieldError(medicalInfoForm, 'bloodType') }}
+          </p>
+          }
+        </div>
+
+        <!-- Spacer -->
+        <div></div>
+
+        <!-- Allergies -->
+        <div class="md:col-span-2">
+          <label
+            for="allergies"
+            class="block text-sm font-medium text-gray-700 mb-2">
+            {{ 'patients.form.allergies' | transloco }}
+            <span class="text-gray-500 text-xs"
+              >({{ 'patients.form.optional' | transloco }})</span
+            >
+          </label>
+          <textarea
+            id="allergies"
+            formControlName="allergies"
+            rows="3"
+            [placeholder]="'patients.form.placeholder.allergies' | transloco"
+            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </textarea>
+        </div>
+
+        <!-- Chronic Conditions -->
+        <div class="md:col-span-2">
+          <label
+            for="chronicConditions"
+            class="block text-sm font-medium text-gray-700 mb-2">
+            {{ 'patients.form.chronicConditions' | transloco }}
+            <span class="text-gray-500 text-xs"
+              >({{ 'patients.form.optional' | transloco }})</span
+            >
+          </label>
+          <textarea
+            id="chronicConditions"
+            formControlName="chronicConditions"
+            rows="3"
+            [placeholder]="'patients.form.placeholder.conditions' | transloco"
+            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </textarea>
+        </div>
+
+        <!-- Current Medications -->
+        <div class="md:col-span-2">
+          <label
+            for="currentMedications"
+            class="block text-sm font-medium text-gray-700 mb-2">
+            {{ 'patients.form.currentMedications' | transloco }}
+            <span class="text-gray-500 text-xs"
+              >({{ 'patients.form.optional' | transloco }})</span
+            >
+          </label>
+          <textarea
+            id="currentMedications"
+            formControlName="currentMedications"
+            rows="3"
+            [placeholder]="'patients.form.placeholder.medications' | transloco"
+            class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          </textarea>
+        </div>
+      </div>
+
+      <!-- Insurance Information -->
+      <div formGroupName="insuranceInfo">
+        <h3 class="text-md font-medium text-gray-900 mb-4">
+          {{ 'patients.form.insurance' | transloco }}
+          <span class="text-gray-500 text-xs"
+            >({{ 'patients.form.optional' | transloco }})</span
+          >
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Insurance Provider -->
+          <div>
+            <label
+              for="provider"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.insuranceProvider' | transloco }}
+            </label>
+            <input
+              type="text"
+              id="provider"
+              formControlName="provider"
+              [placeholder]="'patients.form.placeholder.provider' | transloco"
+              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+
+          <!-- Policy Number -->
+          <div>
+            <label
+              for="policyNumber"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.policyNumber' | transloco }}
+            </label>
+            <input
+              type="text"
+              id="policyNumber"
+              formControlName="policyNumber"
+              [placeholder]="
+                'patients.form.placeholder.policyNumber' | transloco
+              "
+              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+
+          <!-- Group Number -->
+          <div>
+            <label
+              for="groupNumber"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.groupNumber' | transloco }}
+            </label>
+            <input
+              type="text"
+              id="groupNumber"
+              formControlName="groupNumber"
+              [placeholder]="
+                'patients.form.placeholder.groupNumber' | transloco
+              "
+              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+
+          <!-- Valid Until -->
+          <div>
+            <label
+              for="validUntil"
+              class="block text-sm font-medium text-gray-700 mb-2">
+              {{ 'patients.form.validUntil' | transloco }}
+            </label>
+            <input
+              type="date"
+              id="validUntil"
+              formControlName="validUntil"
+              class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Step 4: Emergency Contact -->
+  @if (currentStep() === 4) {
+  <div class="bg-white shadow rounded-lg p-6 animate-fade-in">
+    <h2 class="text-lg font-medium text-gray-900 mb-6">
+      {{ 'patients.form.step4' | transloco }}
+    </h2>
+
+    <div
+      formGroupName="emergencyContact"
+      class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Name -->
+      <div>
+        <label
+          for="emergencyName"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.emergencyContactName' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          id="emergencyName"
+          formControlName="name"
+          [placeholder]="'patients.form.placeholder.contactName' | transloco"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+            (isFieldInvalid(emergencyContactForm, 'name')
+              ? 'border-red-300 bg-red-50'
+              : 'border-gray-300')
+          " />
+        @if (isFieldInvalid(emergencyContactForm, 'name')) {
+        <p class="mt-1 text-sm text-red-600">
+          {{ getFieldError(emergencyContactForm, 'name') }}
+        </p>
+        }
+      </div>
+
+      <!-- Relationship -->
+      <div>
+        <label
+          for="relationship"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.relationship' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <select
+          id="relationship"
+          formControlName="relationship"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+            (isFieldInvalid(emergencyContactForm, 'relationship')
+              ? 'border-red-300 bg-red-50'
+              : 'border-gray-300')
+          ">
+          <option value="">Select relationship</option>
+          @for (relationship of relationships; track relationship) {
+          <option [value]="relationship">{{ relationship }}</option>
+          }
+        </select>
+        @if (isFieldInvalid(emergencyContactForm, 'relationship')) {
+        <p class="mt-1 text-sm text-red-600">
+          {{ getFieldError(emergencyContactForm, 'relationship') }}
+        </p>
+        }
+      </div>
+
+      <!-- Phone -->
+      <div>
+        <label
+          for="emergencyPhone"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.emergencyPhone' | transloco }}
+          <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="tel"
+          id="emergencyPhone"
+          formControlName="phone"
+          [placeholder]="'patients.form.placeholder.contactPhone' | transloco"
+          [class]="
+            'block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ' +
+            (isFieldInvalid(emergencyContactForm, 'phone')
+              ? 'border-red-300 bg-red-50'
+              : 'border-gray-300')
+          " />
+        @if (isFieldInvalid(emergencyContactForm, 'phone')) {
+        <p class="mt-1 text-sm text-red-600">
+          {{ getFieldError(emergencyContactForm, 'phone') }}
+        </p>
+        }
+      </div>
+
+      <!-- Email -->
+      <div>
+        <label
+          for="emergencyEmail"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.form.emergencyEmail' | transloco }}
+          <span class="text-gray-500 text-xs"
+            >({{ 'patients.form.optional' | transloco }})</span
+          >
+        </label>
+        <input
+          type="email"
+          id="emergencyEmail"
+          formControlName="email"
+          [placeholder]="'patients.form.placeholder.contactEmail' | transloco"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Form Actions -->
+  <div class="bg-white shadow rounded-lg p-6">
+    <div class="flex items-center justify-between">
+      <div>
+        @if (!isFirstStep) {
+        <button
+          type="button"
+          (click)="prevStep()"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-dark-700 hover:bg-gray-50 dark:hover:bg-dark-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+          <svg
+            class="w-4 h-4 me-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7" />
+          </svg>
+          {{ 'patients.form.previous' | transloco }}
+        </button>
+        }
+      </div>
+
+      <div class="flex items-center space-x-3">
+        <button
+          type="button"
+          (click)="cancel()"
+          class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-dark-700 hover:bg-gray-50 dark:hover:bg-dark-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+          {{ 'patients.form.cancel' | transloco }}
+        </button>
+
+        @if (!isLastStep) {
+        <button
+          type="button"
+          (click)="nextStep()"
+          [disabled]="!canProceed"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+          {{ 'patients.form.next' | transloco }}
+          <svg
+            class="w-4 h-4 ms-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+        } @else {
+        <button
+          type="submit"
+          [disabled]="!patientForm.valid || saving()"
+          class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+          @if (saving()) {
+          <div
+            class="animate-spin rounded-full h-4 w-4 border-b-2 border-white me-2"></div>
+          {{
+            isEditMode()
+              ? ('patients.form.updating' | transloco)
+              : ('patients.form.creating' | transloco)
+          }}
+          } @else {
+          <svg
+            class="w-4 h-4 me-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 13l4 4L19 7" />
+          </svg>
+          {{
+            isEditMode()
+              ? ('patients.form.update' | transloco)
+              : ('patients.form.create' | transloco)
+          }}
+          }
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+</form>
+}

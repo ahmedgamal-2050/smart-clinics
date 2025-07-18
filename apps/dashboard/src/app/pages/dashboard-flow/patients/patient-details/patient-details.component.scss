@@ -1,0 +1,124 @@
+// Patient Details Component - Using Tailwind CSS classes
+// All styles are now applied directly in the template with RTL and dark mode support
+
+// Custom animations for patient details
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.patient-details {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+// Enhanced patient avatar with gradient
+.patient-avatar {
+  @apply bg-gradient-to-br from-primary-600 to-primary-800 dark:from-primary-500 dark:to-primary-700;
+  transition: all 0.3s ease;
+
+  &:hover {
+    @apply scale-105 shadow-lg;
+  }
+}
+
+// Info section hover effects
+.info-section {
+  @apply transition-all duration-300 ease-in-out;
+
+  &:hover {
+    @apply transform -translate-y-1 shadow-md;
+  }
+}
+
+// Status badge animation
+.status-badge {
+  @apply relative overflow-hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+// Action buttons with enhanced interactions
+.action-button {
+  @apply relative overflow-hidden transition-all duration-300 ease-in-out;
+
+  &:hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+
+  &:active {
+    @apply transform translate-y-0;
+  }
+}
+
+// Data definition styles
+dt {
+  @apply font-semibold text-gray-700 dark:text-gray-300 mb-1;
+}
+
+dd {
+  @apply text-gray-900 dark:text-gray-100 mb-4;
+}
+
+// Medical info highlighting
+.medical-info {
+  .allergies {
+    @apply text-red-600 dark:text-red-400 font-medium;
+  }
+
+  .chronic-conditions {
+    @apply text-orange-600 dark:text-orange-400 font-medium;
+  }
+
+  .medications {
+    @apply text-green-600 dark:text-green-400 font-medium;
+  }
+}
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .patient-avatar {
+    @apply bg-gray-400 border-2 border-gray-600;
+    print-color-adjust: exact;
+  }
+
+  .status-badge {
+    @apply border border-gray-600;
+    print-color-adjust: exact;
+  }
+
+  .info-section {
+    page-break-inside: avoid;
+  }
+
+  .patient-header {
+    page-break-after: avoid;
+  }
+}

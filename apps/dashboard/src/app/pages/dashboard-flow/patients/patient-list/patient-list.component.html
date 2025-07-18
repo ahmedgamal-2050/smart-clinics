@@ -1,0 +1,564 @@
+<!-- Header -->
+<div class="mb-6">
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        {{ 'patients.title' | transloco }}
+      </h1>
+      <p class="mt-2 text-sm text-gray-700 dark:text-gray-300">
+        {{ 'patients.subtitle' | transloco }}
+        <span class="font-medium">{{ totalPatients() }}</span>
+        {{ 'patients.total' | transloco }}
+      </p>
+    </div>
+    <div class="mt-4 sm:mt-0">
+      <button
+        type="button"
+        (click)="createPatient()"
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+        <svg
+          class="w-4 h-4 me-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        {{ 'patients.addNew' | transloco }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Search and Filters -->
+<div class="bg-white dark:bg-dark-800 shadow rounded-lg mb-6">
+  <div class="px-6 py-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Search -->
+      <div class="col-span-1 md:col-span-2 lg:col-span-2">
+        <label
+          for="search"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {{ 'patients.search' | transloco }}
+        </label>
+        <div class="relative">
+          <input
+            type="text"
+            id="search"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+            placeholder="{{ 'patients.searchPlaceholder' | transloco }}"
+            class="block w-full ps-10 pe-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500" />
+          <div
+            class="absolute inset-y-0 start-0 ps-3 flex items-center pointer-events-none">
+            <svg
+              class="h-5 w-5 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gender Filter -->
+      <div>
+        <label
+          for="gender"
+          class="block text-sm font-medium text-gray-700 mb-2">
+          {{ 'patients.gender' | transloco }}
+        </label>
+        <select
+          id="gender"
+          [(ngModel)]="selectedGender"
+          (change)="onGenderChange($event)"
+          class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          <option value="">{{ 'patients.allGenders' | transloco }}</option>
+          <option [value]="Gender.Male">
+            {{ 'patients.male' | transloco }}
+          </option>
+          <option [value]="Gender.Female">
+            {{ 'patients.female' | transloco }}
+          </option>
+          <option [value]="Gender.Other">
+            {{ 'patients.other' | transloco }}
+          </option>
+        </select>
+      </div>
+
+      <!-- Blood Type Filter -->
+      <div>
+        <label
+          for="bloodType"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {{ 'patients.bloodType' | transloco }}
+        </label>
+        <select
+          id="bloodType"
+          [(ngModel)]="selectedBloodType"
+          (change)="onBloodTypeChange($event)"
+          class="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-dark-700 text-gray-900 dark:text-gray-100">
+          <option value="">{{ 'patients.allBloodTypes' | transloco }}</option>
+          <option [value]="BloodType.APositive">A+</option>
+          <option [value]="BloodType.ANegative">A-</option>
+          <option [value]="BloodType.BPositive">B+</option>
+          <option [value]="BloodType.BNegative">B-</option>
+          <option [value]="BloodType.ABPositive">AB+</option>
+          <option [value]="BloodType.ABNegative">AB-</option>
+          <option [value]="BloodType.OPositive">O+</option>
+          <option [value]="BloodType.ONegative">O-</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Filter Actions -->
+    <div
+      class="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex items-center space-x-4">
+        <label class="flex items-center">
+          <input
+            type="checkbox"
+            [(ngModel)]="showInactive"
+            (change)="onShowInactiveChange($event)"
+            class="rounded border-gray-300 dark:border-gray-600 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50 dark:bg-dark-700 dark:checked:bg-primary-600" />
+          <span class="ms-2 text-sm text-gray-700 dark:text-gray-300">
+            {{ 'patients.showInactive' | transloco }}
+          </span>
+        </label>
+
+        @if (hasFilters()) {
+        <button
+          type="button"
+          (click)="clearFilters()"
+          class="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors duration-200">
+          {{ 'patients.clearFilters' | transloco }}
+        </button>
+        }
+      </div>
+
+      <div class="mt-2 sm:mt-0 flex space-x-2">
+        <button
+          type="button"
+          (click)="onSearch()"
+          class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 dark:bg-primary-500 dark:hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+          {{ 'patients.search' | transloco }}
+        </button>
+
+        @if (hasSelection()) {
+        <button
+          type="button"
+          (click)="deleteSelectedPatients()"
+          class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors duration-200">
+          {{ 'patients.deleteSelected' | transloco }} ({{
+            selectedPatients().length
+          }})
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Loading State -->
+@if (loading()) {
+<div class="bg-white dark:bg-dark-800 shadow rounded-lg p-6">
+  <div class="flex items-center justify-center h-32">
+    <div
+      class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 dark:border-primary-400"></div>
+    <span class="ms-3 text-gray-600 dark:text-gray-400">{{
+      'patients.loading' | transloco
+    }}</span>
+  </div>
+</div>
+}
+
+<!-- Error State -->
+@if (error()) {
+<div
+  class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
+  <div class="flex">
+    <svg
+      class="h-5 w-5 text-red-400 dark:text-red-400 mt-0.5"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <div class="ms-3">
+      <h3 class="text-sm font-medium text-red-800 dark:text-red-400">
+        {{ 'patients.error' | transloco }}
+      </h3>
+      <p class="text-sm text-red-700 dark:text-red-400 mt-1">{{ error() }}</p>
+    </div>
+  </div>
+</div>
+}
+
+<!-- Patients Table -->
+@if (!loading() && !error()) {
+<div class="bg-white shadow rounded-lg overflow-hidden">
+  <!-- Table Header -->
+  <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center">
+        <input
+          type="checkbox"
+          [checked]="isAllSelected()"
+          (change)="toggleSelectAll()"
+          class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" />
+        <span class="ms-3 text-sm font-medium text-gray-700">
+          {{ 'patients.selectAll' | transloco }}
+        </span>
+      </div>
+
+      <div class="flex items-center space-x-2">
+        <span class="text-sm text-gray-700">
+          {{ 'patients.showing' | transloco }}
+          {{ (currentPage() - 1) * pageSize() + 1 }} -
+          {{ currentPage() * pageSize() | min : totalPatients() }}
+          {{ 'patients.of' | transloco }} {{ totalPatients() }}
+        </span>
+
+        <select
+          [(ngModel)]="pageSize"
+          (change)="onPageSizeChange($event)"
+          class="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+          @for (size of pageSizeOptions; track size) {
+          <option [value]="size">{{ size }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Content -->
+  @if (patients().length > 0) {
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {{ 'patients.patient' | transloco }}
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {{ 'patients.contact' | transloco }}
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {{ 'patients.medical' | transloco }}
+          </th>
+          <th
+            class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {{ 'patients.status' | transloco }}
+          </th>
+          <th
+            class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {{ 'patients.actions' | transloco }}
+          </th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        @for (patient of patients(); track patient.id) {
+        <tr class="hover:bg-gray-50" [class.bg-red-50]="!patient.isActive">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <input
+                type="checkbox"
+                [checked]="selectedPatients().includes(patient.id)"
+                (change)="togglePatientSelection(patient.id)"
+                class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" />
+              <div class="ms-4">
+                <div class="text-sm font-medium text-gray-900">
+                  {{ getPatientFullName(patient) }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ patient.personalInfo.nationalId }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ calculateAge(patient.personalInfo.dateOfBirth) }}
+                  {{ 'patients.years' | transloco }},
+                  {{ getGenderLabel(patient.personalInfo.gender) }}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">
+              {{ patient.contactInfo.phone }}
+            </div>
+            <div class="text-sm text-gray-500">
+              {{ patient.contactInfo.email }}
+            </div>
+            <div class="text-sm text-gray-500">
+              {{ patient.contactInfo.address.city }},
+              {{ patient.contactInfo.address.country }}
+            </div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm text-gray-900">
+              {{ 'patients.bloodType' | transloco }}:
+              {{ patient.medicalInfo.bloodType }}
+            </div>
+            @if (patient.medicalInfo.allergies.length > 0) {
+            <div class="text-sm text-red-600">
+              {{ 'patients.allergies' | transloco }}:
+              {{ patient.medicalInfo.allergies.join(', ') }}
+            </div>
+            } @if (patient.medicalInfo.chronicConditions.length > 0) {
+            <div class="text-sm text-yellow-600">
+              {{ 'patients.conditions' | transloco }}:
+              {{ patient.medicalInfo.chronicConditions.join(', ') }}
+            </div>
+            }
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span
+              [class]="
+                patient.isActive
+                  ? 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800'
+                  : 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800'
+              ">
+              {{
+                patient.isActive
+                  ? ('patients.active' | transloco)
+                  : ('patients.inactive' | transloco)
+              }}
+            </span>
+          </td>
+          <td
+            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+            <div class="flex items-center justify-end space-x-2">
+              <button
+                type="button"
+                (click)="viewPatient(patient)"
+                class="text-blue-600 hover:text-blue-900"
+                title="{{ 'patients.view' | transloco }}">
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                (click)="editPatient(patient)"
+                class="text-gray-600 hover:text-gray-900"
+                title="{{ 'patients.edit' | transloco }}">
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+              @if (patient.isActive) {
+              <button
+                type="button"
+                (click)="deletePatient(patient)"
+                class="text-red-600 hover:text-red-900"
+                title="{{ 'patients.delete' | transloco }}">
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              } @else {
+              <button
+                type="button"
+                (click)="restorePatient(patient)"
+                class="text-green-600 hover:text-green-900"
+                title="{{ 'patients.restore' | transloco }}">
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+              </button>
+              }
+            </div>
+          </td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  } @else {
+  <div class="text-center py-12">
+    <svg
+      class="mx-auto h-12 w-12 text-gray-400"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <h3 class="mt-2 text-sm font-medium text-gray-900">
+      {{ 'patients.noPatients' | transloco }}
+    </h3>
+    <p class="mt-1 text-sm text-gray-500">
+      {{ 'patients.noPatientsSub' | transloco }}
+    </p>
+    <div class="mt-6">
+      <button
+        type="button"
+        (click)="createPatient()"
+        class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <svg
+          class="w-4 h-4 me-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        {{ 'patients.addFirst' | transloco }}
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Pagination -->
+  @if (patients().length > 0 && totalPages() > 1) {
+  <div class="bg-white px-6 py-4 border-t border-gray-200">
+    <div class="flex items-center justify-between">
+      <div class="flex-1 flex justify-between sm:hidden">
+        <button
+          [disabled]="currentPage() === 1"
+          (click)="onPageChange(currentPage() - 1)"
+          class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ 'patients.previous' | transloco }}
+        </button>
+        <button
+          [disabled]="currentPage() === totalPages()"
+          (click)="onPageChange(currentPage() + 1)"
+          class="ms-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ 'patients.next' | transloco }}
+        </button>
+      </div>
+      <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+        <div>
+          <p class="text-sm text-gray-700">
+            {{ 'patients.showing' | transloco }}
+            <span class="font-medium">
+              {{ (currentPage() - 1) * pageSize() + 1 }}
+            </span>
+            {{ 'patients.to' | transloco }}
+            <span class="font-medium">
+              {{ currentPage() * pageSize() | min : totalPatients() }}
+            </span>
+            {{ 'patients.of' | transloco }}
+            <span class="font-medium">{{ totalPatients() }}</span>
+            {{ 'patients.results' | transloco }}
+          </p>
+        </div>
+        <div>
+          <nav
+            class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+            <button
+              [disabled]="currentPage() === 1"
+              (click)="onPageChange(currentPage() - 1)"
+              class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            @for (page of getPaginationRange(); track page) { @if (page === -1)
+            {
+            <span
+              class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+              ...
+            </span>
+            } @else {
+            <button
+              (click)="onPageChange(page)"
+              [class]="
+                currentPage() === page
+                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium'
+                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium'
+              ">
+              {{ page }}
+            </button>
+            } }
+
+            <button
+              [disabled]="currentPage() === totalPages()"
+              (click)="onPageChange(currentPage() + 1)"
+              class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <svg
+                class="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+</div>
+}

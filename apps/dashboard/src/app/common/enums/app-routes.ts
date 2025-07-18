@@ -1,0 +1,33 @@
+export enum AppRoutes {
+  Auth = 'auth',
+  Login = 'login',
+  Dashboard = 'dashboard',
+  Home = 'home',
+  Patients = 'patients',
+  Appointments = 'appointments',
+  Doctors = 'doctors',
+  Reports = 'reports',
+  Settings = 'settings',
+  Profile = 'profile',
+  Billing = 'billing',
+  Inventory = 'inventory',
+  Analytics = 'analytics',
+  Support = 'support',
+}
+
+export const RouteLabels: Record<AppRoutes, string> = {
+  [AppRoutes.Auth]: 'Auth',
+  [AppRoutes.Login]: 'Login',
+  [AppRoutes.Dashboard]: 'Dashboard',
+  [AppRoutes.Home]: 'Home',
+  [AppRoutes.Patients]: 'Patients',
+  [AppRoutes.Appointments]: 'Appointments',
+  [AppRoutes.Doctors]: 'Doctors',
+  [AppRoutes.Reports]: 'Reports',
+  [AppRoutes.Settings]: 'Settings',
+  [AppRoutes.Profile]: 'Profile',
+  [AppRoutes.Billing]: 'Billing',
+  [AppRoutes.Inventory]: 'Inventory',
+  [AppRoutes.Analytics]: 'Analytics',
+  [AppRoutes.Support]: 'Support',
+};

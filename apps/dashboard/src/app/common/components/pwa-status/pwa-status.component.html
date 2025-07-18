@@ -1,0 +1,51 @@
+<div class="fixed top-5 end-5 z-50 flex flex-col gap-2.5 no-print">
+  <!-- Online/Offline Status -->
+  <div
+    class="flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium backdrop-blur-sm border border-white/20 transition-all duration-200 animate-fade-in"
+    [class]="
+      isOnline
+        ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+        : 'bg-red-500/10 text-red-600 dark:text-red-400'
+    ">
+    <span
+      class="w-2 h-2 rounded-full animate-pulse-subtle"
+      [class]="isOnline ? 'bg-green-500' : 'bg-red-500'"></span>
+    <span>{{ isOnline ? 'Online' : 'Offline' }}</span>
+  </div>
+
+  <!-- Update Available Notification -->
+  @if (updateAvailable) {
+  <div
+    class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 text-blue-600 dark:text-blue-400 backdrop-blur-sm min-w-[280px] animate-slide-in">
+    <div class="flex items-center gap-2.5">
+      <span class="text-lg">🔄</span>
+      <span class="flex-1 text-sm font-medium">New version available!</span>
+      <button
+        class="bg-blue-500 text-white border-0 rounded-md px-3 py-1.5 text-xs font-medium cursor-pointer transition-all duration-200 hover:bg-blue-600 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none active:translate-y-0"
+        (click)="updateApp()"
+        [disabled]="updating">
+        {{ updating ? 'Updating...' : 'Update' }}
+      </button>
+    </div>
+  </div>
+  }
+
+  <!-- Install PWA Prompt -->
+  @if (installable) {
+  <div
+    class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-3 text-blue-600 dark:text-blue-400 backdrop-blur-sm min-w-[280px] animate-slide-in">
+    <div class="flex items-center gap-2.5">
+      <span class="text-lg">📱</span>
+      <span class="flex-1 text-sm font-medium"
+        >Install app for better experience</span
+      >
+      <button
+        class="bg-blue-500 text-white border-0 rounded-md px-3 py-1.5 text-xs font-medium cursor-pointer transition-all duration-200 hover:bg-blue-600 hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none active:translate-y-0"
+        (click)="installApp()"
+        [disabled]="installing">
+        {{ installing ? 'Installing...' : 'Install' }}
+      </button>
+    </div>
+  </div>
+  }
+</div>

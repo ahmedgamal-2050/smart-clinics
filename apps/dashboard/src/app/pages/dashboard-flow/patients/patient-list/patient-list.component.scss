@@ -1,0 +1,39 @@
+// Patient List Component - Using Tailwind CSS classes
+// All styles are now applied directly in the template with RTL and dark mode support
+
+// Custom table styles for better responsiveness
+.patient-table {
+  @apply overflow-x-auto;
+
+  table {
+    @apply min-w-full divide-y divide-gray-200 dark:divide-gray-700;
+  }
+
+  th {
+    @apply px-6 py-3 text-start text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-800;
+  }
+
+  td {
+    @apply px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100;
+  }
+
+  tr:hover {
+    @apply bg-gray-50 dark:bg-gray-800;
+  }
+}
+
+// Custom checkbox styles
+.bulk-checkbox {
+  @apply rounded border-gray-300 dark:border-gray-600 text-primary-600 focus:ring-primary-500 dark:bg-gray-800 dark:checked:bg-primary-600;
+}
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .patient-table {
+    @apply shadow-none;
+  }
+}

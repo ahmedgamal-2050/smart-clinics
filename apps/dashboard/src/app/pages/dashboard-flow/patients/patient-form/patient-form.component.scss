@@ -1,0 +1,34 @@
+// Patient Form Component - Using Tailwind CSS classes
+// All styles are now applied directly in the template with RTL and dark mode support
+
+// Custom focus styles for better accessibility
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  @apply ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-dark-800;
+}
+
+// Custom validation styles
+.form-field input.ng-invalid.ng-touched,
+.form-field textarea.ng-invalid.ng-touched,
+.form-field select.ng-invalid.ng-touched {
+  @apply border-red-500 ring-red-500 dark:border-red-400 dark:ring-red-400;
+}
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-break {
+    page-break-after: always;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .form-grid {
+    @apply grid-cols-1 gap-4;
+  }
+}

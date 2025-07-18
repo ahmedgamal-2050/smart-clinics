@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" fill="#1976d2"/>
+  <g fill="white">
+    <!-- Clinic/Medical Icon -->
+    <circle cx="256" cy="180" r="80" fill="none" stroke="white" stroke-width="16"/>
+    <path d="M256 100v160M176 180h160M200 140l56 80 56-80M200 220l56-80 56 80"/>
+    
+    <!-- Chef Hat -->
+    <ellipse cx="256" cy="120" rx="60" ry="30" fill="white"/>
+    <rect x="196" y="120" width="120" height="40" fill="white"/>
+    
+    <!-- Utensils -->
+    <path d="M150 300v120M150 300l-20-20M150 300l20-20M150 380h-40M150 380h40" stroke="white" stroke-width="8" fill="none"/>
+    <path d="M362 300v120M362 320c-20 0-20-20-20-20s0-20 20-20c20 0 20 20 20 20s0 20-20 20" stroke="white" stroke-width="8" fill="none"/>
+    
+    <!-- Plate -->
+    <circle cx="256" cy="380" r="60" fill="none" stroke="white" stroke-width="8"/>
+    <circle cx="256" cy="380" r="30" fill="none" stroke="white" stroke-width="4"/>
+  </g>
+</svg> 

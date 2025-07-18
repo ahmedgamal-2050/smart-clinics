@@ -1,0 +1,64 @@
+<!-- Page Header -->
+<div class="mb-8">
+  <h1
+    class="text-2xl font-semibold text-gray-900 dark:text-gray-100 transition-colors duration-200">
+    {{ 'dashboard.title' | transloco }}
+  </h1>
+
+  <p
+    class="mt-2 text-sm text-gray-600 dark:text-gray-400 transition-colors duration-200">
+    {{ 'dashboard.subtitle' | transloco }}
+  </p>
+</div>
+
+<!-- Dashboard Content -->
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2 xl:grid-cols-3">
+  <!-- Stats Cards -->
+  @for (statsCard of statsCards(); track statsCard.title) {
+  <app-stats-card [statsCard]="statsCard" />
+  }
+</div>
+
+<!-- Recent Activity -->
+<div class="mt-8">
+  <div
+    class="bg-white dark:bg-dark-800 shadow dark:shadow-dark-900/20 rounded-lg border border-gray-200 dark:border-dark-700 transition-all duration-200">
+    <div class="px-4 py-5 sm:p-6">
+      <h3
+        class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100 transition-colors duration-200">
+        Recent Activity
+      </h3>
+
+      <div class="mt-5">
+        <div class="flow-root">
+          <ul class="-my-5 divide-y divide-gray-200 dark:divide-dark-700">
+            <li class="py-5">
+              <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                  <div
+                    class="h-8 w-8 rounded-full bg-primary-500 dark:bg-primary-600 flex items-center justify-center shadow-sm transition-colors duration-200">
+                    <span class="text-sm font-medium text-white">JP</span>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p
+                    class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate transition-colors duration-200">
+                    New patient registration
+                  </p>
+                  <p
+                    class="text-sm text-gray-500 dark:text-gray-400 truncate transition-colors duration-200">
+                    John Parker registered for cardiology consultation
+                  </p>
+                </div>
+                <div
+                  class="text-sm text-gray-500 dark:text-gray-400 transition-colors duration-200">
+                  2 hours ago
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

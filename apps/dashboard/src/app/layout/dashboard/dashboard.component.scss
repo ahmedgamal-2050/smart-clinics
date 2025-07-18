@@ -1,0 +1,203 @@
+// Dashboard Layout Component - Using Tailwind CSS classes
+// All styles are now applied directly in the template with RTL and dark mode support
+
+// CSS Variables for theming and layout
+:host {
+  --sidebar-width: 16rem;
+  --sidebar-collapsed-width: 4rem;
+  --navbar-height: 4rem;
+  --transition-duration: 300ms;
+  --transition-easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Component animation
+:host {
+  @apply block animate-fade-in;
+}
+
+// Sidebar transitions
+.sidebar-transition {
+  transition: width var(--transition-duration) var(--transition-easing);
+}
+
+// Smooth scrolling for main content
+.main-content {
+  @apply scroll-smooth;
+}
+
+// Card hover animations
+.stat-card {
+  @apply transition-all duration-200 ease-in-out;
+
+  &:hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+}
+
+// Navbar enhancements
+.navbar {
+  @apply backdrop-blur-sm bg-white/95 dark:bg-dark-800/95;
+
+  @supports not (backdrop-filter: blur(10px)) {
+    @apply bg-white/98 dark:bg-dark-800/98;
+  }
+}
+
+// Sidebar menu item animations
+.sidebar-item {
+  @apply relative transition-all duration-200 ease-in-out;
+
+  &:before {
+    content: '';
+    @apply absolute start-0 top-0 h-full w-1 bg-transparent transition-colors duration-200;
+  }
+
+  &.active:before {
+    @apply bg-primary-500;
+  }
+
+  &:hover:not(.active) {
+    @apply bg-primary-50 dark:bg-primary-900/20;
+  }
+}
+
+// Tooltip enhancements
+.tooltip {
+  @apply pointer-events-none transform translate-x-2 transition-all duration-200 ease-in-out;
+
+  &.show {
+    @apply translate-x-0;
+  }
+}
+
+// Mobile menu overlay
+.mobile-overlay {
+  @apply backdrop-blur-sm transition-all duration-300 ease-in-out;
+
+  &.entering {
+    @apply opacity-0;
+  }
+
+  &.entered {
+    @apply opacity-100;
+  }
+}
+
+// Mobile sidebar slide animation
+.mobile-sidebar {
+  @apply transform -translate-x-full transition-transform duration-300 ease-in-out;
+
+  &.open {
+    @apply translate-x-0;
+  }
+}
+
+// PWA specific styles
+@media (display-mode: standalone) {
+  :host {
+    // Add safe area padding for PWA
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .navbar {
+    padding-top: env(safe-area-inset-top);
+    height: calc(var(--navbar-height) + env(safe-area-inset-top));
+  }
+
+  .main-content {
+    padding-top: calc(var(--navbar-height) + env(safe-area-inset-top));
+  }
+}
+
+// Loading states
+.loading {
+  @apply opacity-60 pointer-events-none relative;
+
+  &::after {
+    content: '';
+    @apply absolute top-1/2 start-1/2 w-5 h-5 -mt-2.5 -ms-2.5 border-2 border-gray-300 border-t-primary-600 rounded-full animate-spin;
+  }
+}
+
+// Badge animations
+.badge {
+  @apply animate-pulse-subtle;
+}
+
+// Notification dot
+.notification-dot {
+  @apply relative;
+
+  &::after {
+    content: '';
+    @apply absolute top-0 end-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-dark-800;
+  }
+}
+
+// Enhanced focus indicators
+button:focus-visible,
+[tabindex]:focus-visible {
+  @apply outline-2 outline-primary-500 outline-offset-2;
+}
+
+// Smooth transitions for interactive elements
+button,
+[role='button'] {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+// Micro-interactions
+.interactive-element {
+  @apply transform scale-100 transition-transform duration-100 ease-in-out;
+
+  &:active {
+    @apply scale-98;
+  }
+}
+
+// Print styles
+@media print {
+  .navbar,
+  .sidebar,
+  .mobile-sidebar {
+    display: none !important;
+  }
+
+  .main-content {
+    @apply m-0 p-0;
+  }
+}
+
+// Responsive breakpoints
+@media (max-width: 640px) {
+  .stat-card {
+    &:hover {
+      @apply transform-none shadow-none;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebar-transition {
+    transition: none;
+  }
+}
+
+// Skip link for accessibility
+.skip-link {
+  @apply absolute -top-10 start-2 bg-black text-white p-2 z-50 no-underline;
+
+  &:focus {
+    @apply top-2;
+  }
+}
+
+// Reduced motion preferences
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,151 @@
+<!-- Desktop Sidebar -->
+<div class="hidden lg:flex lg:flex-shrink-0">
+  <div class="flex flex-col">
+    <div
+      [class]="
+        'flex flex-col bg-white dark:bg-dark-800 border-r border-gray-200 dark:border-dark-700 py-4 transition-all duration-300 ease-in-out h-screen ' +
+        (sidebarCollapsed() ? 'w-16' : 'w-64')
+      ">
+      <nav class="flex-1 px-2 space-y-1">
+        @for (item of sidebarItems(); track item.id) {
+        <div class="relative group">
+          <button
+            type="button"
+            [class]="
+              'w-full flex items-center p-2 text-sm font-medium rounded-md transition-colors duration-200 sidebar-item ' +
+              (item.isActive
+                ? 'bg-primary-100 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-700 hover:text-gray-900 dark:hover:text-gray-100') +
+              (sidebarCollapsed() ? ' justify-center' : '')
+            "
+            (click)="navigateToRoute(item.route)"
+            [title]="getSidebarTooltip(item)">
+            <!-- Dashboard Icon -->
+            <svg
+              [class]="
+                'flex-shrink-0 h-6 w-6 transition-colors duration-200 ' +
+                (item.isActive
+                  ? 'text-primary-500 dark:text-primary-400'
+                  : 'text-gray-400 dark:text-gray-500')
+              "
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                [attr.d]="item.icon" />
+            </svg>
+
+            @if (!sidebarCollapsed()) {
+            <span class="ms-3">{{ item.label }}</span>
+            @if (item.badge) {
+            <span
+              [class]="
+                'ms-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ' +
+                item.badgeColor
+              ">
+              {{ item.badge }}
+            </span>
+            } }
+          </button>
+
+          <!-- Tooltip for collapsed sidebar -->
+          @if (sidebarCollapsed()) {
+          <div
+            class="absolute start-full top-0 ms-2 px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white dark:text-gray-100 text-sm rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-50">
+            {{ item.label }}
+            @if (item.badge) {
+            <span
+              [class]="
+                'ms-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium text-white ' +
+                item.badgeColor
+              ">
+              {{ item.badge }}
+            </span>
+            }
+          </div>
+          }
+        </div>
+        }
+      </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile Sidebar Overlay -->
+@if (mobileMenuOpen()) {
+<div class="fixed inset-0 flex z-40 lg:hidden">
+  <div
+    class="fixed inset-0 bg-gray-600/75 dark:bg-gray-900/80 transition-opacity duration-300"
+    (click)="closeMobileMenu()"
+    (keyup.escape)="closeMobileMenu()"
+    tabindex="0"></div>
+
+  <div
+    class="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-dark-800 shadow-xl transition-transform duration-300">
+    <div class="absolute top-0 end-0 me-12 pt-2">
+      <button
+        type="button"
+        class="ms-1 flex items-center justify-center h-10 w-10 rounded-full text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-dark-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-all duration-200"
+        (click)="closeMobileMenu()">
+        <svg
+          class="h-6 w-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+      <nav class="mt-5 px-2 space-y-1">
+        @for (item of sidebarItems(); track item.id) {
+        <button
+          type="button"
+          [class]="
+            'w-full flex items-center p-2 text-base font-medium rounded-md transition-colors duration-200 ' +
+            (item.isActive
+              ? 'bg-primary-100 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400'
+              : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-dark-700 hover:text-gray-900 dark:hover:text-gray-100')
+          "
+          (click)="navigateToRoute(item.route)">
+          <svg
+            [class]="
+              'me-4 flex-shrink-0 h-6 w-6 transition-colors duration-200 ' +
+              (item.isActive
+                ? 'text-primary-500 dark:text-primary-400'
+                : 'text-gray-400 dark:text-gray-500')
+            "
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              [attr.d]="item.icon" />
+          </svg>
+          {{ item.label }}
+          @if (item.badge) {
+          <span
+            [class]="
+              'ms-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-white ' +
+              item.badgeColor
+            ">
+            {{ item.badge }}
+          </span>
+          }
+        </button>
+        }
+      </nav>
+    </div>
+  </div>
+</div>
+}

@@ -1,0 +1,95 @@
+// Login Component - Using Tailwind CSS classes
+// All styles are now applied directly in the template with RTL and dark mode support
+
+// Custom animations for better user experience
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// Component container animation
+:host {
+  display: block;
+  animation: fadeIn 0.6s ease-out;
+}
+
+// Form container animation
+.bg-white {
+  animation: slideIn 0.8s ease-out 0.2s both;
+}
+
+// Custom focus styles for better accessibility
+input:focus {
+  @apply ring-2 ring-primary-500 ring-offset-2 ring-offset-white dark:ring-offset-dark-800;
+  transition: box-shadow 0.15s ease-in-out;
+}
+
+// Button hover animation
+button[type='submit']:not(:disabled) {
+  @apply transition-all duration-200 ease-in-out;
+
+  &:hover {
+    @apply transform -translate-y-0.5 shadow-lg;
+  }
+
+  &:active {
+    @apply transform translate-y-0;
+  }
+}
+
+// Error message animation
+.error-message {
+  animation: slideIn 0.3s ease-out;
+}
+
+// Password visibility toggle button
+.password-toggle {
+  @apply cursor-pointer transition-colors duration-200 ease-in-out;
+
+  &:hover {
+    @apply text-gray-700 dark:text-gray-300;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 640px) {
+  .max-w-md {
+    @apply mx-4;
+  }
+}
+
+// Disabled state enhancement
+button:disabled {
+  @apply pointer-events-none opacity-60;
+}
+
+// Form validation state transitions
+.border-red-300 {
+  @apply transition-colors duration-200 ease-in-out;
+}
+
+.border-gray-300 {
+  @apply transition-colors duration-200 ease-in-out;
+}
+
+// Loading spinner enhancement
+.loading-spinner {
+  @apply animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full;
+}

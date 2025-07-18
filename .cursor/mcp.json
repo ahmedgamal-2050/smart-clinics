@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "cursor10x-mcp": {
+      "command": "npx",
+      "args": [
+        "cursor10x-mcp"
+      ],
+      "enabled": true,
+      "env": {
+        "TURSO_DATABASE_URL": "libsql://cursor10x-mcp-jimmy11.aws-eu-west-1.turso.io",
+        "TURSO_AUTH_TOKEN": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NDQ5NzU0MzIsImlkIjoiNzVjZjViODUtOTMzMC00ODgzLTg1M2UtNjE2YmEzMDlkMDMwIiwicmlkIjoiMWE1MzQyNzYtYTM0MC00MTVjLThjMWYtNjM2M2JmZTg1NGY0In0.ZOw41_DmRasNj5oXBgWpxFjhf1sdqAVAHUQLCAZ4TbCOGdzwXB4bHTH5BQQntgprqaA8Bd_1GIGudqZhA_9_Cw"
+      }
+    }
+  },
+  "performance": {
+    "maxConcurrentRequests": 8,
+    "cacheTTL": 3600,
+    "compression": true
+  }
+}
